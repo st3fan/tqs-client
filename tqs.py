@@ -14,7 +14,7 @@ def encode_body(body):
     if type(body) == str:
         return body, "text/plain"
     if type(body) == bytes:
-        return base64.b64encode(body), "application/octet-stream"
+        return base64.b64encode(body).decode("ascii"), "application/octet-stream"
     if type(body) in (list, dict):
         return json.dumps(body), "application/json"
     raise Error("Don't know how to encode body of type <%s>" % type(body).__name__)
@@ -24,7 +24,7 @@ def decode_body(body_data, body_type):
     if body_type in (None, "text/plain"):
         return body_data
     if body_type == "application/octet-stream":
-        return base64.b64.decode(body_data)
+        return base64.b64decode(body_data)
     if body_type == "application/json":
         return json.loads(body_data)
     raise Error("Don't know how to decode body of type <%s>" % body_type)
