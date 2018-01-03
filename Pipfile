@@ -13,3 +13,5 @@ requests = "*"
 [dev-packages]
 
 pytest = "*"
+wheel = "*"
+twine = "*"
