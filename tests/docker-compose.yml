@@ -1,0 +1,9 @@
+# -*- coding: utf-8 -*-
+
+version: "3"
+
+services:
+  tqs:
+    image: "tqs-server:latest"
+    ports:
+      - "8080"

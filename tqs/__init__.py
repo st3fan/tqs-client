@@ -39,6 +39,7 @@ class Message:
     def __init__(self, queue, message):
         self.queue = queue
         self.message = message
+        self.decoded_body = decode_body(self.body_text, self.body_type)
 
     def delete(self):
         r = requests.delete(self.queue.queue_url + "/leases/" + self.message["lease_uuid"], headers=self.queue.headers)
@@ -46,7 +47,15 @@ class Message:
 
     @property
     def body(self):
-        return self.message["body"]
+        return self.decoded_body
+
+    @property
+    def body_text(self):
+        return self.message["body"] # TODO Should become body_text
+
+    @property
+    def body_type(self):
+        return self.message["type"] # TODO Should become body_type
 
     @property
     def create_date(self):
@@ -119,6 +128,7 @@ class Queue:
         for queue in r.json()["queues"]:
             if queue["name"] == self.queue_name:
                 return True
+        return False
 
     def create(self):
         r = requests.post(self.endpoint + "/queues", json={"name": self.queue_name}, headers=self.headers)
@@ -139,6 +149,18 @@ class Queue:
                 messages.append({"body": body_data, "type": body_type})
             r = requests.post(self.queue_url, json={"messages": messages}, headers=self.headers)
             r.raise_for_status()
+
+    # TODO This is essentially the same code as the poller
+    def get(self, auto_delete=False):
+        params = { "message_count": 1 }
+        if auto_delete is True:
+            params["delete"] = "true"
+        r = requests.get(self.queue_url, params=params, headers=self.headers)
+        r.raise_for_status()
+        result = r.json()
+        messages = result["messages"]
+        if len(messages) > 0:
+            return Message(self, messages[0])
 
     def messages(self, batch_size=1, auto_delete=False):
         return QueuePoller(self, batch_size=batch_size, auto_delete=auto_delete)
