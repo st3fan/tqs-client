@@ -4,6 +4,6 @@ version: "3"
 
 services:
   tqs:
-    image: "tqs-server:latest"
+    image: "st3fan/tqs-server:latest"
     ports:
       - "8080"
