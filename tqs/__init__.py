@@ -166,5 +166,5 @@ class Queue:
         if len(messages) > 0:
             return Message(self, messages[0])
 
-    def messages(self, batch_size=1, auto_delete=False):
-        return QueuePoller(self, batch_size=batch_size, auto_delete=auto_delete)
+    def messages(self, batch_size=1, auto_delete=False, wait_time=0):
+        return QueuePoller(self, batch_size=batch_size, auto_delete=auto_delete, wait_time=wait_time)
