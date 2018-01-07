@@ -2,23 +2,13 @@
 
 from setuptools import setup
 
-setup_requires = [
-    "wheel",
-]
-
-install_requires = [
-    "requests",
-]
-
 setup(
     name = "tqs_client",
-    version = "0.3",
-    packages = ["tqs"],
-    #
-    setup_requires = setup_requires,
-    install_requires = install_requires,
-    python_requires = "~=3.6",
-    #
+    version = "0.4",
+    py_modules = ["tqs"],
+    setup_requires = ["wheel"],
+    install_requires = ["requests"],
+    python_requires = ">=3",
     description = "Tiny Queue Service Client",
     author = "Stefan Arentz",
     author_email = "stefan@arentz.ca",
