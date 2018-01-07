@@ -87,11 +87,12 @@ class Message:
 
 class QueuePoller:
 
-    def __init__(self, queue, batch_size=1, auto_delete=False):
+    def __init__(self, queue, batch_size=1, auto_delete=False, wait_time=0):
         self.queue = queue
         self.batch_size = batch_size
         self.batch = []
         self.auto_delete = auto_delete
+        self.wait_time = wait_time
 
     def __iter__(self):
         return self
@@ -100,15 +101,18 @@ class QueuePoller:
         params = { "message_count": self.batch_size }
         if self.auto_delete is True:
             params["delete"] = "true"
+        if self.wait_time != 0:
+            params["wait_time"] = str(self.wait_time)
         while True:
             if len(self.batch) == 0:
-                r = requests.get(self.queue.queue_url, params=params, headers=self.queue.headers)
+                r = requests.get(self.queue.queue_url, params=params, headers=self.queue.headers, timeout=self.wait_time+5)
                 r.raise_for_status()
                 result = r.json()
                 self.batch = result["messages"]
             if len(self.batch) > 0:
                 return Message(self.queue, self.batch.pop())
-            time.sleep(2.5)
+            if self.wait_time != 0:
+                time.sleep(2.5)
 
 
 class Queue:
