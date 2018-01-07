@@ -93,6 +93,7 @@ class QueuePoller:
         self.batch = []
         self.auto_delete = auto_delete
         self.wait_time = wait_time
+        self.delay_time = 2.5
 
     def __iter__(self):
         return self
@@ -104,6 +105,7 @@ class QueuePoller:
         if self.wait_time != 0:
             params["wait_time"] = str(self.wait_time)
         while True:
+            start_time = time.time()
             if len(self.batch) == 0:
                 r = requests.get(self.queue.queue_url, params=params, headers=self.queue.headers, timeout=self.wait_time+5)
                 r.raise_for_status()
@@ -111,8 +113,8 @@ class QueuePoller:
                 self.batch = result["messages"]
             if len(self.batch) > 0:
                 return Message(self.queue, self.batch.pop())
-            if self.wait_time != 0:
-                time.sleep(2.5)
+            if time.time() - start_time < self.delay_time:
+                time.sleep(self.delay_time) # This could be exponential
 
 
 class Queue:
