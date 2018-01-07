@@ -107,7 +107,9 @@ class QueuePoller:
             params["delete"] = "true"
         if self.wait_time != 0:
             params["wait_time"] = str(self.wait_time)
-        while self.done_check():
+        while True:
+            if self.done_check():
+                raise StopIteration()
             start_time = time.time()
             if len(self.batch) == 0:
                 r = requests.get(self.queue.queue_url, params=params, headers=self.queue.headers, timeout=self.wait_time+5)

@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name = "tqs_client",
-    version = "0.6",
+    version = "0.7",
     py_modules = ["tqs"],
     setup_requires = ["wheel"],
     install_requires = ["requests"],
