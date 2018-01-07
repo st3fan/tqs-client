@@ -12,7 +12,7 @@ install_requires = [
 
 setup(
     name = "tqs_client",
-    version = "0.2",
+    version = "0.3",
     packages = ["tqs"],
     #
     setup_requires = setup_requires,
