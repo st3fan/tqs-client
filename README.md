@@ -6,3 +6,14 @@
 
 TODO LOTS TO DO
 
+Notes on building and pushing a Python package:
+
+```
+git add Pipfile.lock setup.cfg setup.py
+git commit
+git tag 0.4 -m "0.4"
+git push --tags
+python setup.py sdist bdist_wheel
+twine upload --repository pypi dist/tqs_client-0.4*
+```
+
