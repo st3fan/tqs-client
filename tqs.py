@@ -87,13 +87,16 @@ class Message:
 
 class QueuePoller:
 
-    def __init__(self, queue, batch_size=1, auto_delete=False, wait_time=0):
+    def __init__(self, queue, batch_size=1, auto_delete=False, wait_time=0, done_check=None):
         self.queue = queue
         self.batch_size = batch_size
         self.batch = []
         self.auto_delete = auto_delete
         self.wait_time = wait_time
         self.delay_time = 2.5
+        self.done_check = done_check
+        if not self.done_check:
+            self.done_check = lambda: True
 
     def __iter__(self):
         return self
@@ -104,7 +107,7 @@ class QueuePoller:
             params["delete"] = "true"
         if self.wait_time != 0:
             params["wait_time"] = str(self.wait_time)
-        while True:
+        while self.done_check():
             start_time = time.time()
             if len(self.batch) == 0:
                 r = requests.get(self.queue.queue_url, params=params, headers=self.queue.headers, timeout=self.wait_time+5)
@@ -168,5 +171,5 @@ class Queue:
         if len(messages) > 0:
             return Message(self, messages[0])
 
-    def messages(self, batch_size=1, auto_delete=False, wait_time=0):
-        return QueuePoller(self, batch_size=batch_size, auto_delete=auto_delete, wait_time=wait_time)
+    def messages(self, batch_size=1, auto_delete=False, wait_time=0, done_check=None):
+        return QueuePoller(self, batch_size=batch_size, auto_delete=auto_delete, wait_time=wait_time, done_check=done_check)
